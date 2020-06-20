@@ -95,6 +95,9 @@ class Predict(Resource):
         payload = request.get_json()
         
         indexed_tokens = self.tokenizer.encode(payload['text'])
+        num_words = int(payload('words'))
+        print(f"num_words: {num_words}")
+
         self.num_words = 200 if 200 < int(payload['words']) else int(payload['words'])
         output = sample_sequence(self.model, self.num_words, indexed_tokens, device=self.device)
         return self.tokenizer.decode(

@@ -1,0 +1,40 @@
+language: python
+
+service: docker
+
+dist: xenial
+
+branches:
+  only:
+    - master
+    - "/^release-[0-9]+\\..*$/"
+
+# install:
+#   - make imagenet
+
+stages:
+  - build
+  - push
+
+jobs:
+  include:
+    - stage: build
+      name: build
+      python: "3.6"
+      script: |
+        make build
+        make run-local
+        make test-local
+    - stage: push
+      name: push
+      if: type = push AND branch =~ /^master$/
+      script: |
+        make build
+        make push
+
+after_success:
+  # Necessary to run coverage combine to rewrite paths from
+  # /travis/env/path/site-packages/torchvision to actual path
+  - coverage combine .coverage
+  - coverage report
+  - codecov

@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: huggingface
+  labels:
+    name: staging
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: huggingface
+  labels:
+    app: huggingface
+  name: huggingface
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: huggingface
+  template:
+    metadata:
+      labels:
+        app: huggingface
+    spec: 
+      containers:
+      - image: quay.io/cdoan0/huggingface-distilgpt2:latest
+        imagePullPolicy: Always
+        name: huggingface
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: huggingface
+  labels:
+    app: huggingface
+  name: huggingface
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: huggingface
+  # type: LoadBalancer
